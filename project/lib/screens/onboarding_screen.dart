@@ -19,7 +19,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   //Page Controller
 
 final PageController _controller = PageController();
-bool showDetailsPage = true;
+bool showDetailsPage = false;
 
   @override
   Widget build(BuildContext context) {

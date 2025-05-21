@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:project/screens/onboarding_screen.dart';
+import 'package:project/services/user_services.dart';
+import 'package:project/widgets/wrapper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 
@@ -10,14 +15,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Expenz",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: "Inter"
-      ),
-      home: OnboardingScreen()
+    return FutureBuilder(
+      future: UserServices.checkUsername(), 
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.waiting){
+          return CircularProgressIndicator();
+        }
 
-    );
+        else{
+          bool hasUserName = snapshot.data ?? false;
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              fontFamily: "Inter",
+            ),
+
+            home: Wrapper(showMainScreen: hasUserName),
+          );
+        }
+      },);
   }
 }

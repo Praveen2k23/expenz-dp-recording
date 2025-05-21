@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project/constant/colors.dart';
 import 'package:project/constant/constants.dart';
+import 'package:project/screens/main_screen.dart';
+import 'package:project/services/user_services.dart';
 import 'package:project/widgets/custom_button.dart';
 
 class UserDataScreen extends StatefulWidget {
@@ -103,15 +105,6 @@ class _UserDataScreenState extends State<UserDataScreen> {
                       TextFormField(
                         controller: _confirmPasswordController,
                         obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please Confirm Your Password";
-                          }
-                          if (value != _passwordController.text) {
-                            return "Passwords do not match";
-                          }
-                          return null;
-                        },
                         decoration: InputDecoration(
                           hintText: "Confirm Password",
                           border: OutlineInputBorder(
@@ -140,17 +133,24 @@ class _UserDataScreenState extends State<UserDataScreen> {
                       ),
                       SizedBox(height: 15),
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async{
                           if (_formKey.currentState!.validate()) {
                             String userName = _userNameController.text;
                             String email = _emailController.text;
                             String password = _passwordController.text;
                             String confirmPassword = _confirmPasswordController.text;
 
-                            print("Name: $userName");
-                            print("Email: $email");
-                            print("Password: $password");
-                            print("Confirm Password: $confirmPassword");
+                            await UserServices.storeUserDetails(
+                              userName: userName, email: email, password: password, confirmPassword: confirmPassword, context: context);
+
+                              if(context.mounted) {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return MainScreen();
+                              },));
+                              }
+                       
+
+                            
                           }
                         },
                         child: CustomButton(
