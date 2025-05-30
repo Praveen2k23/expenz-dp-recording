@@ -1,38 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:project/screens/onboarding_screen.dart';
 import 'package:project/services/user_services.dart';
 import 'package:project/widgets/wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPreferences.getInstance();
+  await SharedPreferences.getInstance(); // optional if used later
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool? hasUserName;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUser();
+  }
+
+  void _checkUser() async {
+    bool result = await UserServices.checkUsername();
+    setState(() {
+      hasUserName = result;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: UserServices.checkUsername(), 
-      builder: (context, snapshot) {
-        if(snapshot.connectionState == ConnectionState.waiting){
-          return CircularProgressIndicator();
-        }
+    if (hasUserName == null) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
 
-        else{
-          bool hasUserName = snapshot.data ?? false;
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              fontFamily: "Inter",
-            ),
-
-            home: Wrapper(showMainScreen: hasUserName),
-          );
-        }
-      },);
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: "Inter"),
+      home: Wrapper(showMainScreen: hasUserName!),
+    );
   }
 }

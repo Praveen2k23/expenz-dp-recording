@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:project/constant/colors.dart';
 import 'package:project/constant/constants.dart';
 import 'package:project/screens/main_screen.dart';
@@ -20,6 +21,37 @@ class _UserDataScreenState extends State<UserDataScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('rememberMe') ?? false;
+      if (_rememberMe) {
+        _userNameController.text = prefs.getString('userName') ?? '';
+        _emailController.text = prefs.getString('email') ?? '';
+        _passwordController.text = prefs.getString('password') ?? '';
+        _confirmPasswordController.text = prefs.getString('password') ?? '';
+      }
+    });
+  }
+
+  void _saveUserData(String userName, String email, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (_rememberMe) {
+      await prefs.setBool('rememberMe', true);
+      await prefs.setString('userName', userName);
+      await prefs.setString('email', email);
+      await prefs.setString('password', password); // For demo only (not secure)
+    } else {
+      await prefs.clear();
+    }
+  }
 
   @override
   void dispose() {
@@ -133,24 +165,31 @@ class _UserDataScreenState extends State<UserDataScreen> {
                       ),
                       SizedBox(height: 15),
                       GestureDetector(
-                        onTap: () async{
+                        onTap: () async {
                           if (_formKey.currentState!.validate()) {
                             String userName = _userNameController.text;
                             String email = _emailController.text;
                             String password = _passwordController.text;
                             String confirmPassword = _confirmPasswordController.text;
 
+                            _saveUserData(userName, email, password);
+
                             await UserServices.storeUserDetails(
-                              userName: userName, email: email, password: password, confirmPassword: confirmPassword, context: context);
+                              userName: userName,
+                              email: email,
+                              password: password,
+                              confirmPassword: confirmPassword,
+                              context: context,
+                            );
 
-                              if(context.mounted) {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                return MainScreen();
-                              },));
-                              }
-                       
-
-                            
+                            if (context.mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MainScreen(),
+                                ),
+                              );
+                            }
                           }
                         },
                         child: CustomButton(
