@@ -4,10 +4,13 @@ import 'package:project/constant/colors.dart';
 import 'package:project/constant/constants.dart';
 import 'package:project/model/expens_model.dart';
 import 'package:project/model/income_model.dart';
+import 'package:project/services/expense_service.dart';
 import 'package:project/widgets/custom_button.dart';
 
 class AddNewScreen extends StatefulWidget {
-  const AddNewScreen({super.key});
+
+  final Function(Expense) addExpense;
+  const AddNewScreen({super.key, required this.addExpense});
 
   @override
   State<AddNewScreen> createState() => _AddNewScreenState();
@@ -391,8 +394,27 @@ SizedBox(height: 20,),
 
         SizedBox(height: 20,),
 
-        CustomButton(buttonName: "Add", 
-        buttonColor: _selectedMethods == 0 ? kRed : kGreen)
+        GestureDetector(
+          onTap: () async{
+
+            List<Expense> loadedExpenses = await ExpenseService().loadExpenses();
+
+            Expense expense = Expense(
+              id: loadedExpenses.length + 1, 
+              title: _titleController.text, 
+              amount: _amountController.text.isEmpty ? 0 : double.parse(_amountController.text), 
+              category: _expenceCategory, 
+              date: _selectedDate, 
+              time: _selectedTime, 
+              description: _descriptionController.text);
+
+              widget.addExpense(expense);
+            
+          },
+          child: CustomButton(
+            buttonName: "Add", 
+          buttonColor: _selectedMethods == 0 ? kRed : kGreen),
+        )
 
 
 
