@@ -5,12 +5,14 @@ import 'package:project/constant/constants.dart';
 import 'package:project/model/expens_model.dart';
 import 'package:project/model/income_model.dart';
 import 'package:project/services/expense_service.dart';
+import 'package:project/services/income_service.dart';
 import 'package:project/widgets/custom_button.dart';
 
 class AddNewScreen extends StatefulWidget {
 
   final Function(Expense) addExpense;
-  const AddNewScreen({super.key, required this.addExpense});
+  final Function (Income) addIncome;
+  const AddNewScreen({super.key, required this.addExpense, required this.addIncome});
 
   @override
   State<AddNewScreen> createState() => _AddNewScreenState();
@@ -396,6 +398,8 @@ SizedBox(height: 20,),
 
         GestureDetector(
           onTap: () async{
+            //save the expense or the income data into shared pref
+            if(_selectedMethods == 0){
 
             List<Expense> loadedExpenses = await ExpenseService().loadExpenses();
 
@@ -408,7 +412,41 @@ SizedBox(height: 20,),
               time: _selectedTime, 
               description: _descriptionController.text);
 
+              //add expense
               widget.addExpense(expense);
+
+
+              //clear the fields
+              _titleController.clear();
+              _amountController.clear();
+              _descriptionController.clear();
+
+
+            }
+
+            else{
+
+              //Load incomes
+              List <Income> loadedIncomes = 
+              await IncomeService().loadIncomes();
+              //crreate the new income
+
+              Income income = Income(
+                id: loadedIncomes.length + 1, title: _titleController.text, 
+                amount: _amountController.text.isEmpty ? 0 : double.parse(_amountController.text), 
+                category: _incomeCategory, 
+                date: _selectedDate, time: _selectedTime, description: _descriptionController.text);
+
+                widget.addIncome(income);
+
+                
+              //clear the fields
+              _titleController.clear();
+              _amountController.clear();
+              _descriptionController.clear();
+            }
+
+
             
           },
           child: CustomButton(

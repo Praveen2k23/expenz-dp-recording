@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart'; // For local storag
 
 class ExpenseService {
   // List to hold expenses temporarily (not currently used)
-  List<Expense> expenceList = [];
+  // List<Expense> expenceList = [];
 
   // Key used to store/retrieve the expense list from SharedPreferences
   static String _expenseKey = 'expenses';

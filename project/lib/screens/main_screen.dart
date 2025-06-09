@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 // Importing project-specific files and resources
 import 'package:project/constant/colors.dart'; // Custom colors
 import 'package:project/model/expens_model.dart'; // Expense model
+import 'package:project/model/income_model.dart';
 import 'package:project/screens/add_new_screen.dart'; // Screen to add a new expense
 import 'package:project/screens/budget_screen.dart'; // Budget screen
 import 'package:project/screens/home_screen.dart'; // Home screen
 import 'package:project/screens/profile_screen.dart'; // Profile screen
 import 'package:project/screens/transaction_screen.dart'; // Transactions screen
-import 'package:project/services/expense_service.dart'; // Expense service to handle saving/loading
+import 'package:project/services/expense_service.dart';
+import 'package:project/services/income_service.dart'; // Expense service to handle saving/loading
 
 // Main widget that contains bottom navigation and switches between pages
 class MainScreen extends StatefulWidget {
@@ -24,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // List to hold expenses retrieved from local storage
   List<Expense> expenseList = [];
+  List <Income> incomeList = [];
 
   // Function to load all expenses from shared preferences
   void fetchAllExpenses() async {
@@ -36,6 +39,16 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+
+  void fetchAllIncomes() async {
+    List<Income> loadIncomes = await IncomeService().loadIncomes();
+    setState(() {
+      incomeList = loadIncomes;
+      print(incomeList.length);
+    });
+  }
+
+
   // Function to add a new expense
   void addNewExpense(Expense newExpense) {
     // Save the expense to shared preferences
@@ -47,11 +60,23 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+
+  // Function to add a new expense
+  void addNewIncome(Income newIncome) {
+    // Save the expense to shared preferences
+    IncomeService().saveIncome(newIncome, context);
+
+    // Update the UI immediately
+    setState(() {
+      incomeList.add(newIncome);
+    });
+  }
   @override
   void initState() {
     // Load the saved expenses when the widget is initialized
     setState(() {
       fetchAllExpenses();
+      fetchAllIncomes();
     });
     super.initState();
   }
@@ -61,7 +86,7 @@ Widget build(BuildContext context) {
   final List<Widget> pages = [
     HomeScreen(),
     TransactionScreen(),
-    AddNewScreen(addExpense: addNewExpense),
+    AddNewScreen(addExpense: addNewExpense, addIncome: addNewIncome,),
     BudgetScreen(),
     ProfileScreen(),
   ];
@@ -127,7 +152,7 @@ Widget build(BuildContext context) {
       ),
 
       // Display the current page based on selected index
-      body: pages[_currentPageIndex],
+      body: pages[_currentPageIndex] ,
     );
   }
 }
