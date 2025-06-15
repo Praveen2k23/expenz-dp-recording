@@ -48,6 +48,17 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+    @override
+  void initState() {
+    // Load the saved expenses when the widget is initialized
+    setState(() {
+      fetchAllExpenses();
+      fetchAllIncomes();
+    });
+    super.initState();
+  }
+
+
 
   // Function to add a new expense
   void addNewExpense(Expense newExpense) {
@@ -60,8 +71,19 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  // Function to delete an expense
+  void removeExpense(Expense expense) {
+    // Delete the expense from shared preferences
+    ExpenseService().deleteExpense(expense.id, context);
 
-  // Function to add a new expense
+    // Update the list of expenses
+    setState(() {
+      expenseList.remove(expense);
+    });
+  }
+
+
+  // Function to add a new income
   void addNewIncome(Income newIncome) {
     // Save the expense to shared preferences
     IncomeService().saveIncome(newIncome, context);
@@ -71,21 +93,27 @@ class _MainScreenState extends State<MainScreen> {
       incomeList.add(newIncome);
     });
   }
-  @override
-  void initState() {
-    // Load the saved expenses when the widget is initialized
+
+
+  // Function to delete an income
+  void removeIncome(Income income) {
+    // Delete the income from shared preferences
+    IncomeService().deleteIncome(income.id, context);
+
+    // Update the list of incomes
     setState(() {
-      fetchAllExpenses();
-      fetchAllIncomes();
+      incomeList.remove(income);
     });
-    super.initState();
   }
+
+
+
 
 @override
 Widget build(BuildContext context) {
   final List<Widget> pages = [
     HomeScreen(),
-    TransactionScreen(),
+    TransactionScreen(expensesList: expenseList, onDismissedExpense: removeExpense, incomeList: incomeList, onDismissedIncome: removeIncome,),
     AddNewScreen(addExpense: addNewExpense, addIncome: addNewIncome,),
     BudgetScreen(),
     ProfileScreen(),

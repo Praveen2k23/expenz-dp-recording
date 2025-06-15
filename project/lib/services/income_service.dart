@@ -80,4 +80,63 @@ Future<List<Income>> loadIncomes() async {
   // Return the list of Income objects
   return loadedIncomes;
 }
+
+
+
+    // Function to delete an income
+  Future<void> deleteIncome(int id, BuildContext context) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String>? existingIncomes = prefs.getStringList(_incomeKey);
+
+      // Convert the existing incomes to a list of Income objects
+      List<Income> existingIncomeObjects = [];
+      if (existingIncomes != null) {
+        existingIncomeObjects = existingIncomes
+            .map((e) => Income.fromJSON(json.decode(e)))
+            .toList();
+      }
+
+      // Remove the income with the given id from the list
+      existingIncomeObjects.removeWhere((element) => element.id == id);
+
+      // Convert the list of Income objects back to a list of strings
+      List<String> updatedIncomes =
+          existingIncomeObjects.map((e) => json.encode(e.toJSON())).toList();
+
+      // Save the updated list of incomes to shared preferences
+      await prefs.setStringList(_incomeKey, updatedIncomes);
+
+      //show snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Income deleted successfully'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  
+  // Function to delete all incomes
+  Future<void> deleteAllIncomes(BuildContext context) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Clear all incomes from shared preferences
+      await prefs.remove(_incomeKey);
+
+      //show snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All incomes deleted successfully'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
