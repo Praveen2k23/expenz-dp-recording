@@ -26,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // List to hold expenses retrieved from local storage
   List<Expense> expenseList = [];
-  List <Income> incomeList = [];
+  List<Income> incomeList = [];
 
   // Function to load all expenses from shared preferences
   void fetchAllExpenses() async {
@@ -39,7 +39,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-
   void fetchAllIncomes() async {
     List<Income> loadIncomes = await IncomeService().loadIncomes();
     setState(() {
@@ -48,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-    @override
+  @override
   void initState() {
     // Load the saved expenses when the widget is initialized
     setState(() {
@@ -57,8 +56,6 @@ class _MainScreenState extends State<MainScreen> {
     });
     super.initState();
   }
-
-
 
   // Function to add a new expense
   void addNewExpense(Expense newExpense) {
@@ -82,7 +79,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-
   // Function to add a new income
   void addNewIncome(Income newIncome) {
     // Save the expense to shared preferences
@@ -93,7 +89,6 @@ class _MainScreenState extends State<MainScreen> {
       incomeList.add(newIncome);
     });
   }
-
 
   // Function to delete an income
   void removeIncome(Income income) {
@@ -106,21 +101,23 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      HomeScreen(expensesList: expenseList, incomeList: incomeList,),
+      TransactionScreen(
+        expensesList: expenseList,
+        onDismissedExpense: removeExpense,
+        incomeList: incomeList,
+        onDismissedIncome: removeIncome,
+      ),
+      AddNewScreen(addExpense: addNewExpense, addIncome: addNewIncome),
+      BudgetScreen(),
+      ProfileScreen(),
+    ];
 
-
-
-@override
-Widget build(BuildContext context) {
-  final List<Widget> pages = [
-    HomeScreen(),
-    TransactionScreen(expensesList: expenseList, onDismissedExpense: removeExpense, incomeList: incomeList, onDismissedIncome: removeIncome,),
-    AddNewScreen(addExpense: addNewExpense, addIncome: addNewIncome,),
-    BudgetScreen(),
-    ProfileScreen(),
-  ];
-
-  return Scaffold(
-    // ... rest of your Scaffold code
+    return Scaffold(
+      // ... rest of your Scaffold code
       // Bottom navigation bar for page switching
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // Fixed layout
@@ -128,7 +125,6 @@ Widget build(BuildContext context) {
         selectedItemColor: kMainColor, // Active icon color
         unselectedItemColor: kGrey, // Inactive icon color
         currentIndex: _currentPageIndex, // Current selected tab index
-
         // Called when a tab is tapped
         onTap: (index) {
           setState(() {
@@ -143,10 +139,7 @@ Widget build(BuildContext context) {
 
         // Bottom navigation items (icons + labels)
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(
             icon: Icon(Icons.list_rounded),
             label: "Transactions",
@@ -159,28 +152,18 @@ Widget build(BuildContext context) {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Icon(
-                  Icons.add,
-                  size: 35,
-                  color: kWhite,
-                ),
+                child: Icon(Icons.add, size: 35, color: kWhite),
               ),
             ),
             label: "Add",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.rocket),
-            label: "Budget",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.rocket), label: "Budget"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
 
       // Display the current page based on selected index
-      body: pages[_currentPageIndex] ,
+      body: pages[_currentPageIndex],
     );
   }
 }
