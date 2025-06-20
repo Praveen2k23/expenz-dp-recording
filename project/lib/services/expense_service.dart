@@ -15,16 +15,16 @@ class ExpenseService {
 
       List<Expense> existingExpensesObjects = [];
       if (existingExpenses != null) {
-        existingExpensesObjects = existingExpenses
-            .map((e) => Expense.fromJSON(json.decode(e)))
-            .toList();
+        existingExpensesObjects =
+            existingExpenses
+                .map((e) => Expense.fromJSON(json.decode(e)))
+                .toList();
       }
 
       existingExpensesObjects.add(expence);
 
-      List<String> updatedExpenses = existingExpensesObjects
-          .map((e) => json.encode(e.toJSON()))
-          .toList();
+      List<String> updatedExpenses =
+          existingExpensesObjects.map((e) => json.encode(e.toJSON())).toList();
 
       await prefs.setStringList(_expenseKey, updatedExpenses);
 
@@ -55,9 +55,10 @@ class ExpenseService {
 
     List<Expense> loadedExpenses = [];
     if (existingExpenses != null) {
-      loadedExpenses = existingExpenses
-          .map((e) => Expense.fromJSON(json.decode(e)))
-          .toList();
+      loadedExpenses =
+          existingExpenses
+              .map((e) => Expense.fromJSON(json.decode(e)))
+              .toList();
     }
 
     return loadedExpenses;
@@ -71,9 +72,10 @@ class ExpenseService {
 
       List<Expense> existingExpenseObjects = [];
       if (existingExpenses != null) {
-        existingExpenseObjects = existingExpenses
-            .map((e) => Expense.fromJSON(json.decode(e)))
-            .toList();
+        existingExpenseObjects =
+            existingExpenses
+                .map((e) => Expense.fromJSON(json.decode(e)))
+                .toList();
       }
 
       existingExpenseObjects.removeWhere((element) => element.id == id);
@@ -113,6 +115,24 @@ class ExpenseService {
       }
     } catch (e) {
       print(e.toString());
+    }
+
+    //delete all expenses from shared preferences
+    Future<void> deleteAllExpenses(BuildContext context) async {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_expenseKey);
+
+        //show snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('All expenses deleted successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } catch (e) {
+        print(e.toString());
+      }
     }
   }
 }

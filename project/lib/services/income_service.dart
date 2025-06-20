@@ -139,4 +139,22 @@ Future<List<Income>> loadIncomes() async {
       print(e.toString());
     }
   }
+
+      //delete all income from shared preferences
+    Future<void> deleteAllExpenses(BuildContext context) async {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_incomeKey);
+
+        //show snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('All income deleted successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } catch (e) {
+        print(e.toString());
+      }
+    }
 }
